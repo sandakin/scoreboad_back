@@ -92,7 +92,7 @@ DATABASES = {
         'NAME': os.getenv('db_name', 'scoreboard'),
         'USER': os.getenv('db_user', 'hsg'),
         'PASSWORD': os.getenv('db_pass', 'Qwerty@123'),
-        'HOST': os.getenv('db_host', '172.17.0.2'),  # Or an IP Address that your DB is hosted on
+        'HOST': os.getenv('db_host', '127.0.0.1'),  # Or an IP Address that your DB is hosted on
         'PORT': '3306',
     },
 }
@@ -101,7 +101,7 @@ DATABASES = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
-        #'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
