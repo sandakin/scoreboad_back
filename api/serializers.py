@@ -9,6 +9,7 @@ import pytz
 class UserSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
     user_type = serializers.SerializerMethodField()
+    team = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -18,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_is_online(obj):
         if hasattr(obj, 'user_state'):
-            return 120 > (datetime.datetime.now(pytz.utc)-obj.user_state.last_ping).seconds
+            return 120 > (datetime.datetime.now(pytz.utc) - obj.user_state.last_ping).seconds
         return False
 
     @staticmethod
@@ -29,12 +30,40 @@ class UserSerializer(serializers.ModelSerializer):
             return "player"
         return "staff"
 
+    @staticmethod
+    def get_team(obj):
+        try:
+            if hasattr(obj, 'staff'):
+                return TeamSerializer(obj.staff.team).data
+            if hasattr(obj, 'player'):
+                return TeamSerializer(obj.player.team).data
+        except Exception as e:
+            print(str(e))
+
+
+def user_validation(user):
+    errors = {'user': None}
+    if user.is_superuser:
+        errors['user'] = "Can't assign admin user"
+
+    elif hasattr(user, 'player'):
+        errors['user'] = "Link with other player"
+
+    elif hasattr(user, 'staff'):
+        errors['user'] = "Link with staff user"
+
+    if errors['user']:
+        raise serializers.ValidationError(errors)
+
 
 class StaffSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Staff
         fields = '__all__'
+
+    def validate(self, attrs):
+        user_validation(attrs['user'])
+        return super().validate(attrs)
 
 
 class TournamentSerializer(serializers.ModelSerializer):
@@ -50,7 +79,6 @@ class TournamentSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Team
         fields = '__all__'
@@ -92,9 +120,12 @@ class PlayerSerializer(serializers.ModelSerializer):
     def get_avg_score(obj):
         return PlayerScore.objects.filter(player=obj).aggregate(Avg('points')).get('points__avg')
 
+    def validate(self, attrs):
+        user_validation(attrs['user'])
+        return super().validate(attrs)
+
 
 class PlayerScoreSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = PlayerScore
         fields = '__all__'
@@ -126,9 +157,6 @@ class GameSerializer(serializers.ModelSerializer):
 
 
 class TeamScoreSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = TeamScore
         fields = '__all__'
-
-
