@@ -49,6 +49,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     """ view set for manage vendor """
     queryset = Player.objects.all().order_by('-id')
     serializer_class = PlayerSerializer
+    filterset_fields = ['team']
 
 
 class PlayerScoreViewSet(viewsets.ModelViewSet):

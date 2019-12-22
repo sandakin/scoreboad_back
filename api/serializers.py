@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from api.models import (Tournament, Team, Player, PlayerScore, Game, GameScore, TeamScore, Staff)
+from django.db.models import Sum, Avg
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -32,10 +33,40 @@ class TeamSerializer(serializers.ModelSerializer):
 
 
 class PlayerSerializer(serializers.ModelSerializer):
+    no_of_game = serializers.SerializerMethodField()
+    tot_min = serializers.SerializerMethodField()
+    tot_rebounds = serializers.SerializerMethodField()
+    tot_assists = serializers.SerializerMethodField()
+    tot_point = serializers.SerializerMethodField()
+    avg_score = serializers.SerializerMethodField()
 
     class Meta:
         model = Player
         fields = '__all__'
+
+    @staticmethod
+    def get_no_of_game(obj):
+        return PlayerScore.objects.filter(player=obj).count()
+
+    @staticmethod
+    def get_tot_min(obj):
+        return PlayerScore.objects.filter(player=obj).aggregate(Sum('minutes_played')).get('minutes_played__sum')
+
+    @staticmethod
+    def get_tot_rebounds(obj):
+        return PlayerScore.objects.filter(player=obj).aggregate(Sum('rebounds')).get('rebounds__sum')
+
+    @staticmethod
+    def get_tot_assists(obj):
+        return PlayerScore.objects.filter(player=obj).aggregate(Sum('assists')).get('assists__sum')
+
+    @staticmethod
+    def get_tot_point(obj):
+        return PlayerScore.objects.filter(player=obj).aggregate(Sum('points')).get('points__sum')
+
+    @staticmethod
+    def get_avg_score(obj):
+        return PlayerScore.objects.filter(player=obj).aggregate(Avg('points')).get('points__avg')
 
 
 class PlayerScoreSerializer(serializers.ModelSerializer):
