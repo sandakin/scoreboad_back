@@ -18,7 +18,6 @@ class Tournament(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=45)
-    # logo = models.CharField(max_length=45)
     logo = models.FileField()
 
     def __str__(self):
@@ -89,3 +88,8 @@ class TeamScore(models.Model):
     fouls_personal = models.IntegerField()
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_score')
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='team_score')
+
+
+class UserState(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_state')
+    last_ping = models.DateTimeField(null=True)

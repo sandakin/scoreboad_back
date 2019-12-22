@@ -2,13 +2,32 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from api.models import (Tournament, Team, Player, PlayerScore, Game, GameScore, TeamScore, Staff)
 from django.db.models import Sum, Avg
+import datetime
+import pytz
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_online = serializers.SerializerMethodField()
+    user_type = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('password', 'is_superuser', 'is_staff', 'groups', 'user_permissions', 'is_active')
+
+    @staticmethod
+    def get_is_online(obj):
+        if hasattr(obj, 'user_state'):
+            return 120 > (datetime.datetime.now(pytz.utc)-obj.user_state.last_ping).seconds
+        return False
+
+    @staticmethod
+    def get_user_type(obj):
+        if obj.is_superuser:
+            return "admin"
+        if hasattr(obj, 'player'):
+            return "player"
+        return "staff"
 
 
 class StaffSerializer(serializers.ModelSerializer):

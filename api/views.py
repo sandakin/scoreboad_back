@@ -1,18 +1,36 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from django.contrib.auth.models import User
-from api.models import (Tournament, Team, Player, PlayerScore, Game, GameScore, TeamScore, Staff)
+from rest_framework import permissions
+from api.models import (Tournament, Team, Player, PlayerScore, Game, GameScore, TeamScore, Staff, UserState)
 from api.serializers import (GameSerializer, TournamentSerializer, TeamSerializer, GameScoreSerializer, StaffSerializer,
                              TeamScoreSerializer, PlayerSerializer, UserSerializer, PlayerScoreSerializer)
-
+import datetime
+import pytz
 
 # Create your views here.
 
 
+class CurrentUserViewSet(viewsets.ModelViewSet):
+    """ view set for manage vendor """
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = User.objects.all().order_by('-id')
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
+
+
 class UserViewSet(viewsets.ModelViewSet):
     """ view set for manage vendor """
-    queryset = User.objects.exclude(is_superuser=True).order_by('-id')
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = User.objects.all().order_by('-id')
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return User.objects.exclude(id=self.request.user.id)
 
 
 class TournamentViewSet(viewsets.ModelViewSet):
@@ -62,3 +80,12 @@ class StaffViewSet(viewsets.ModelViewSet):
     """ view set for manage vendor """
     queryset = Staff.objects.all().order_by('-id')
     serializer_class = StaffSerializer
+
+
+class KeepUserOnlineViewSet(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @staticmethod
+    def get(request):
+        UserState.objects.update_or_create(user=request.user, defaults={"last_ping": datetime.datetime.now(pytz.utc)})
+        return Response({"status": 1})
