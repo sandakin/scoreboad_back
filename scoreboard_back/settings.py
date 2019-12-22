@@ -82,10 +82,18 @@ WSGI_APPLICATION = 'scoreboard_back.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'data': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    },
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('db_name', 'scoreboard'),
+        'USER': os.getenv('db_user', 'hsg'),
+        'PASSWORD': os.getenv('db_pass', 'Qwerty@123'),
+        'HOST': os.getenv('db_host', '127.0.0.1'),  # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
+    },
 }
 
 
