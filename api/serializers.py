@@ -43,6 +43,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 def user_validation(user):
     errors = {'user': None}
+    if not user:
+        return
+    
     if user.is_superuser:
         errors['user'] = "Can't assign admin user"
 
