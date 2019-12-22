@@ -38,10 +38,15 @@ class StaffSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
+    games = serializers.SerializerMethodField()
 
     class Meta:
         model = Tournament
         fields = '__all__'
+
+    @staticmethod
+    def get_games(obj):
+        return GameSerializer(obj.games.all(), many=True).data
 
 
 class TeamSerializer(serializers.ModelSerializer):
