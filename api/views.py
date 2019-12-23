@@ -9,6 +9,8 @@ from api.serializers import (GameSerializer, TournamentSerializer, TeamSerialize
                              TeamScoreSerializer, PlayerSerializer, UserSerializer, PlayerScoreSerializer)
 import datetime
 import pytz
+from django.db.models import F
+
 
 # Create your views here.
 
@@ -88,5 +90,15 @@ class KeepUserOnlineViewSet(APIView):
 
     @staticmethod
     def get(request):
-        UserState.objects.update_or_create(user=request.user, defaults={"last_ping": datetime.datetime.now(pytz.utc)})
+        defaults = {"last_ping": datetime.datetime.now(pytz.utc)}
+        if hasattr(request.user, 'user_state'):
+            state = request.user.user_state
+            if state.last_ping:
+                state.tot_time_spend = state.tot_time_spend + (
+                            datetime.datetime.now(pytz.utc) - state.last_ping).seconds
+                state.save()
+        else:
+            defaults['tot_time_spend'] = (datetime.datetime.now(pytz.utc) - request.user.last_login).seconds
+
+        UserState.objects.update_or_create(user=request.user, defaults=defaults)
         return Response({"status": 1})

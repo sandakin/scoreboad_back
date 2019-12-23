@@ -93,3 +93,5 @@ class TeamScore(models.Model):
 class UserState(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_state')
     last_ping = models.DateTimeField(null=True)
+    num_of_login = models.IntegerField(default=0)
+    tot_time_spend = models.IntegerField(default=0)

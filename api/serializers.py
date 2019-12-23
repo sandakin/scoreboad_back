@@ -6,10 +6,16 @@ import datetime
 import pytz
 
 
+def is_online(last_ping):
+    return 120 > (datetime.datetime.now(pytz.utc) - last_ping).seconds
+
+
 class UserSerializer(serializers.ModelSerializer):
     is_online = serializers.SerializerMethodField()
     user_type = serializers.SerializerMethodField()
     team = serializers.SerializerMethodField()
+    num_of_login = serializers.SerializerMethodField()
+    tot_time_spend = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -19,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_is_online(obj):
         if hasattr(obj, 'user_state'):
-            return 120 > (datetime.datetime.now(pytz.utc) - obj.user_state.last_ping).seconds
+            return is_online(obj.user_state.last_ping)
         return False
 
     @staticmethod
@@ -39,6 +45,18 @@ class UserSerializer(serializers.ModelSerializer):
                 return TeamSerializer(obj.player.team).data
         except Exception as e:
             print(str(e))
+
+    @staticmethod
+    def get_num_of_login(obj):
+        if hasattr(obj, 'user_state'):
+            return obj.user_state.num_of_login
+        return 0
+
+    @staticmethod
+    def get_tot_time_spend(obj):
+        if hasattr(obj, 'user_state'):
+            return obj.user_state.tot_time_spend
+        return 0
 
 
 def user_validation(user):
