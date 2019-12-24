@@ -9,7 +9,6 @@ from api.serializers import (GameSerializer, TournamentSerializer, TeamSerialize
                              TeamScoreSerializer, PlayerSerializer, UserSerializer, PlayerScoreSerializer)
 import datetime
 import pytz
-from django.db.models import F
 
 
 # Create your views here.

@@ -39,6 +39,9 @@ class Player(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='player')
     user = models.OneToOneField(User, on_delete=models.SET_NULL, related_name='player', null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Game(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='games')
