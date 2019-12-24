@@ -8,5 +8,10 @@ def handle_app_authorized(sender, request, token, **kwargs):
     del (sender, request, kwargs)
     # user_obj = User.objects.get(id=token.user)
     token.user.last_login = datetime.datetime.now(pytz.utc)
-    UserState.objects.update_or_create(user=token.user, defaults={"num_of_login": F('num_of_login') + 1})
+    if hasattr(token.user, 'user_state'):
+        state = token.user.user_state
+        state.num_of_login += 1
+        state.save()
+    else:
+        UserState.objects.create(user=token.user, num_of_login=1)
     token.user.save()
