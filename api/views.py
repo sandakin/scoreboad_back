@@ -50,6 +50,11 @@ class TeamViewSet(viewsets.ModelViewSet):
         team_list = [obj.id for obj in team_list]
         return Team.objects.filter(id__in=team_list)
 
+    # def list(self, request, *args, **kwargs):
+    #     team_list = super().list(request, args, kwargs)
+    #     team_list.data = sorted(team_list.data, key=lambda k: k['avg_score'], reverse=True)
+    #     return team_list
+
 
 class GameScoreViewSet(viewsets.ModelViewSet):
     """ view set for manage vendor """
