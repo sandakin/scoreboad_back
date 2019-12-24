@@ -45,6 +45,11 @@ class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all().order_by('-id')
     serializer_class = TeamSerializer
 
+    def list(self, request, *args, **kwargs):
+        team_list = super().list(request, args, kwargs)
+        team_list.data = sorted(team_list.data, key=lambda k: k['avg_score'], reverse=True)
+        return team_list
+
 
 class GameScoreViewSet(viewsets.ModelViewSet):
     """ view set for manage vendor """
@@ -94,7 +99,7 @@ class KeepUserOnlineViewSet(APIView):
             state = request.user.user_state
             if state.last_ping:
                 state.tot_time_spend = state.tot_time_spend + (
-                            datetime.datetime.now(pytz.utc) - state.last_ping).seconds
+                        datetime.datetime.now(pytz.utc) - state.last_ping).seconds
                 state.save()
         else:
             defaults['tot_time_spend'] = (datetime.datetime.now(pytz.utc) - request.user.last_login).seconds
