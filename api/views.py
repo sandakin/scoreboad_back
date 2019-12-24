@@ -9,7 +9,7 @@ from api.serializers import (GameSerializer, TournamentSerializer, TeamSerialize
                              TeamScoreSerializer, PlayerSerializer, UserSerializer, PlayerScoreSerializer)
 import datetime
 import pytz
-
+from rest_framework import filters
 
 # Create your views here.
 
@@ -80,6 +80,11 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all().order_by('-id')
     serializer_class = PlayerSerializer
     filterset_fields = ['team']
+
+    def list(self, request, *args, **kwargs):
+        player_list = super().list(request, args, kwargs)
+        player_list.data = sorted(player_list.data, key=lambda k: k['avg_score'], reverse=True)
+        return player_list
 
 
 class PlayerScoreViewSet(viewsets.ModelViewSet):

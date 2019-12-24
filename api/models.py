@@ -52,6 +52,15 @@ class Player(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def avg_score(self):
+        try:
+            avg = PlayerScore.objects.filter(player=self).aggregate(Avg('points')).get('points__avg')
+            return avg if avg else 0
+        except Exception as e:
+            print(str(e))
+        return 0
+
 
 class Game(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='games')

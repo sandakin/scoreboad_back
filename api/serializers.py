@@ -133,7 +133,8 @@ class PlayerSerializer(serializers.ModelSerializer):
     tot_rebounds = serializers.SerializerMethodField()
     tot_assists = serializers.SerializerMethodField()
     tot_point = serializers.SerializerMethodField()
-    avg_score = serializers.SerializerMethodField()
+    # avg_score = serializers.SerializerMethodField()
+    avg_score = serializers.FloatField()
 
     class Meta:
         model = Player
@@ -159,9 +160,9 @@ class PlayerSerializer(serializers.ModelSerializer):
     def get_tot_point(obj):
         return PlayerScore.objects.filter(player=obj).aggregate(Sum('points')).get('points__sum')
 
-    @staticmethod
-    def get_avg_score(obj):
-        return PlayerScore.objects.filter(player=obj).aggregate(Avg('points')).get('points__avg')
+    # @staticmethod
+    # def get_avg_score(obj):
+    #     return PlayerScore.objects.filter(player=obj).aggregate(Avg('points')).get('points__avg')
 
     def validate(self, attrs):
         user_validation(attrs['user'])
