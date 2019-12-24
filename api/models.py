@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Avg
 from django.contrib.auth.models import User
 
 
@@ -22,6 +23,15 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def avg_score(self):
+        try:
+            avg = TeamScore.objects.filter(team=self).aggregate(Avg('total_points')).get('total_points__avg')
+            return avg if avg else 0
+        except Exception as e:
+            print(str(e))
+        return 0
 
 
 class Staff(models.Model):

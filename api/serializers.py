@@ -100,7 +100,7 @@ class TournamentSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    avg_score = serializers.SerializerMethodField()
+    avg_score = serializers.FloatField()
     best_score = serializers.SerializerMethodField()
     num_of_win = serializers.SerializerMethodField()
     num_of_lost = serializers.SerializerMethodField()
@@ -108,16 +108,6 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = '__all__'
-
-    @staticmethod
-    def get_avg_score(obj):
-        try:
-            avg = TeamScore.objects.filter(team=obj).aggregate(Avg('total_points')).get('total_points__avg')
-            return avg if avg else 0
-
-        except Exception as e:
-            print(str(e))
-        return 0
 
     @staticmethod
     def get_best_score(obj):

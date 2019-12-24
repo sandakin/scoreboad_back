@@ -42,13 +42,13 @@ class TournamentViewSet(viewsets.ModelViewSet):
 
 class TeamViewSet(viewsets.ModelViewSet):
     """ view set for manage vendor """
-    queryset = Team.objects.all().order_by('-id')
+    queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
-    def list(self, request, *args, **kwargs):
-        team_list = super().list(request, args, kwargs)
-        team_list.data = sorted(team_list.data, key=lambda k: k['avg_score'], reverse=True)
-        return team_list
+    def get_queryset(self):
+        team_list = sorted(Team.objects.all(), key=lambda t: t.avg_score, reverse=True)
+        team_list = [obj.id for obj in team_list]
+        return Team.objects.filter(id__in=team_list)
 
 
 class GameScoreViewSet(viewsets.ModelViewSet):
