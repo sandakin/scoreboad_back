@@ -30,8 +30,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-id')
     serializer_class = UserSerializer
 
-    def get_queryset(self):
-        return User.objects.exclude(id=self.request.user.id)
+    # def get_queryset(self):
+    #     return User.objects.exclude(id=self.request.user.id)
 
 
 class TournamentViewSet(viewsets.ModelViewSet):
@@ -52,7 +52,10 @@ class TeamViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         team_list = super().list(request, args, kwargs)
-        team_list.data = sorted(team_list.data, key=lambda k: k['avg_score'], reverse=True)
+        try:
+            team_list.data = sorted(team_list.data, key=lambda k: k['avg_score'], reverse=True)
+        except Exception as e:
+            print(str(e))
         return team_list
 
 
@@ -83,7 +86,10 @@ class PlayerViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         player_list = super().list(request, args, kwargs)
-        player_list.data = sorted(player_list.data, key=lambda k: k['avg_score'], reverse=True)
+        try:
+            player_list.data = sorted(player_list.data, key=lambda k: k['avg_score'], reverse=True)
+        except Exception as e:
+            print(str(e))
         return player_list
 
 
