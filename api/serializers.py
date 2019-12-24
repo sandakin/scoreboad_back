@@ -7,7 +7,11 @@ import pytz
 
 
 def is_online(last_ping):
-    return 120 > (datetime.datetime.now(pytz.utc) - last_ping).seconds
+    try:
+        return 120 > (datetime.datetime.now(pytz.utc) - last_ping).seconds
+    except Exception as e:
+        print(str(e))
+    return False
 
 
 class UserSerializer(serializers.ModelSerializer):
